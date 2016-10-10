@@ -7,7 +7,7 @@
 
 ## Manage IAP product
 
-We need a table to store all the product info, the schema is:
+On the server side, we need a table to store all the product info, the schema is:
 ```
 id | product_id | title | description | coins | enabled | time_created | time_updated
 ```
@@ -85,5 +85,7 @@ A sample response:
   }
 }
 ```
-If the transactionId is in the response, then it's a valid transaction, we then insert a record into the transaction table.
+If the transactionId is in the response, then it's a valid transaction, we then insert a record into the transaction table, and tell client it's okay, then, client can clear the saved transaction id.
+
+If there's something wrong with the server. The client should provide a retry mechanism to verify the saved transaction.
 

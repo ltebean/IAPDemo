@@ -18,4 +18,57 @@ id | transaction_id | product_id | user_id | time_created | time_updated
 * product_id: which product
 * user_id: who bought the product
 
-## Client side
+
+When client finishes a purchase, it sends the receipt to the server, server then sends the receipt to apple's server to verify it. It's a POST request, the url is:
+
+* sandbox: https://sandbox.itunes.apple.com/verifyReceipt 
+* product: https://buy.itunes.apple.com/verifyReceipt
+
+The body is 
+```json
+{
+   "receipt-data": receipt string
+}
+```
+A sample response: 
+```json
+{
+  "status": 0,
+  "environment": "Sandbox",
+  "receipt": {
+    "receipt_type": "ProductionSandbox",
+    "adam_id": 0,
+    "app_item_id": 0,
+    "bundle_id": "io.ltebean.iapdemo",
+    "application_version": "1",
+    "download_id": 0,
+    "version_external_identifier": 0,
+    "receipt_creation_date": "2016-10-10 06:41:00 Etc/GMT",
+    "receipt_creation_date_ms": "1476081660000",
+    "receipt_creation_date_pst": "2016-10-09 23:41:00 America/Los_Angeles",
+    "request_date": "2016-10-10 06:44:18 Etc/GMT",
+    "request_date_ms": "1476081858144",
+    "request_date_pst": "2016-10-09 23:44:18 America/Los_Angeles",
+    "original_purchase_date": "2013-08-01 07:00:00 Etc/GMT",
+    "original_purchase_date_ms": "1375340400000",
+    "original_purchase_date_pst": "2013-08-01 00:00:00 America/Los_Angeles",
+    "original_application_version": "1.0",
+    "in_app": [
+      {
+        "quantity": "1",
+        "product_id": "io.ltebean.iapdemo.iap1",
+        "transaction_id": "1000000241260292",
+        "original_transaction_id": "1000000241260292",
+        "purchase_date": "2016-10-10 06:34:34 Etc/GMT",
+        "purchase_date_ms": "1476081274000",
+        "purchase_date_pst": "2016-10-09 23:34:34 America/Los_Angeles",
+        "original_purchase_date": "2016-10-10 06:34:34 Etc/GMT",
+        "original_purchase_date_ms": "1476081274000",
+        "original_purchase_date_pst": "2016-10-09 23:34:34 America/Los_Angeles",
+        "is_trial_period": "false"
+      }
+    ]
+  }
+}
+```
+

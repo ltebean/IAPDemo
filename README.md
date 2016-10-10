@@ -1,8 +1,8 @@
 ## Some work in itunesconnect
 
 * Create an app with an id, for example: com.test.app
-* Create some iap product, the id of the product maybe "com.test.app.iap.coins1"
-* Create an sandbox user to test iap
+* Create some iap product, the id of the product may be: "com.test.app.iap.coins1"
+* Create a sandbox user to test iap
 
 
 ## Manage IAP product
@@ -41,7 +41,7 @@ Then, we send the transactionId along with the receipt to our server, the server
 The body is 
 ```json
 {
-   "receipt-data": receipt string
+   "receipt-data": "the receipt string sent by the client"
 }
 ```
 A sample response: 

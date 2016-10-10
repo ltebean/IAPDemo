@@ -7,5 +7,5 @@ target 'IAPDemo' do
 
   # Pods for IAPDemo
   pod 'SVProgressHUD'
-  pod 'SwiftyStoreKit', :git => 'git@github.com:bizz84/SwiftyStoreKit.git', :branch => 'master'
+  pod 'IAPHelper'
 end

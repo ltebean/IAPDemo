@@ -7,7 +7,7 @@
 //
 
 import UIKit
-import SwiftyStoreKit
+import IAPHelper
 import SVProgressHUD
 import StoreKit
 
@@ -39,6 +39,8 @@ class ProductCell: UITableViewCell {
 
 class ViewController: UIViewController {
 
+    let iapHelper = IAPShare.sharedHelper()!
+    
     @IBOutlet weak var tableView: UITableView!
     var products: [SKProduct] = []
 
@@ -46,6 +48,7 @@ class ViewController: UIViewController {
         super.viewDidLoad()
         tableView.tableFooterView = UIView(frame: CGRect.zero)
         tableView.dataSource = self
+        
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -58,49 +61,69 @@ class ViewController: UIViewController {
         ] as Set
         
         SVProgressHUD.show()
-
-        SwiftyStoreKit.retrieveProductsInfo(productIds) { result in
-            let products = result.retrievedProducts
-            guard products.count > 0 else {
+        iapHelper.iap = IAPHelper(productIdentifiers: productIds)
+        
+        iapHelper.iap.requestProducts(completion: { request, response in
+            guard let products = response?.products, products.count > 0 else {
                 SVProgressHUD.showError(withStatus: "Failed to find product")
                 return
             }
             SVProgressHUD.dismiss()
-            
+    
             self.products = products.sorted(by: { p1, p2 -> Bool in
                 return p1.price.compare(p2.price) == .orderedAscending
             })
             self.tableView.reloadData()
-            
-        }
+        })
     }
 
     func buy(product: SKProduct) {
         SVProgressHUD.show()
-        SwiftyStoreKit.purchaseProduct(product.productIdentifier) { [weak self] result in
-            switch result {
-            case .success(_):
-                SVProgressHUD.showSuccess(withStatus: "Success")
-                self?.verifyTransaction()
-            case .error(_):
-                SVProgressHUD.showError(withStatus: "Error")
-            }
-        }
+        iapHelper.iap.buyProduct(product, onCompletion: { [weak self] transaction in
+            SVProgressHUD.showSuccess(withStatus: "Success")
+            self?.savePendingTransaction(id: transaction!.transactionIdentifier!)
+            self?.verifyPendingTransaction()
+        })
+
     }
     
-    func verifyTransaction() {
+    func savePendingTransaction(id: String) {
+        UserDefaults.standard.set(id, forKey: "transaction")
+    }
+    
+    func getPendingTransaction() -> String? {
+        return UserDefaults.standard.string(forKey: "transaction")
+    }
+    
+    func clearPendingTransaction() {
+        UserDefaults.standard.removeObject(forKey: "transaction")
+    }
+    
+    func verifyPendingTransaction() {
+        guard let transactionId = getPendingTransaction() else {
+            return
+        }
         let url = Bundle.main.appStoreReceiptURL!
         let receipt = try! Data(contentsOf: url).base64EncodedString()
-        // send this string to the server, let the server verify it
-        // https://developer.apple.com/library/content/releasenotes/General/ValidateAppStoreReceipt/Chapters/ValidateRemotely.html
+        print("receipt: \(receipt)")
+        
+        let data = [
+            "transaction": transactionId,
+            "receipt": receipt
+        ]
+        // post the data to the server, let the server verify whether the transaction is valid
         
         // the server can get the transaction id and product id from the response by apple
         // then the server gives the user coins
         
         // server should also check whether the transction id is duplicated to proctect against fake request
+        
+        // if server returns success, clear the pending transaction
+        // if server is down, present a ui to allow the user to retry, we just need to call verifyPendingTransaction again.
+        
+        clearPendingTransaction()
     }
     
-
 
 }
 

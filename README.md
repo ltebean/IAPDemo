@@ -1,6 +1,5 @@
-## Server side
 
-#### The Product Table
+## Manage IAP product
 
 First we need a table to store all the product info, the schema is:
 ```
@@ -14,7 +13,7 @@ id | product_id | title | description | coins | enabled | time_created | time_up
 
 After register all the iap product in itunesconnect, insert the corresponding record into this table, when the client enters the purchase page, it will fetch all the enabled product in this table and then display them to the user.
 
-#### The Transaction Table
+## Handle transaction
 
 We also need a table to store all the transactions
 ```

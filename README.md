@@ -1,7 +1,13 @@
+## Some work in itunesconnect
+
+* Create an app with an id, for example: com.test.app
+* Create some iap product, the id of the product maybe "com.test.app.iap.coins1"
+* Create an sandbox user to test iap
+
 
 ## Manage IAP product
 
-First we need a table to store all the product info, the schema is:
+We need a table to store all the product info, the schema is:
 ```
 id | product_id | title | description | coins | enabled | time_created | time_updated
 ```
@@ -12,6 +18,7 @@ id | product_id | title | description | coins | enabled | time_created | time_up
 * coins: the corresponding coins that will be given to the user 
 
 After register all the iap product in itunesconnect, insert the corresponding record into this table, when the client enters the purchase page, it will fetch all the enabled product in this table and then display them to the user.
+
 
 ## Handle transaction
 
@@ -24,7 +31,9 @@ id | transaction_id | product_id | user_id | time_created | time_updated
 * user_id: who bought the product
 
 
-When client finishes a purchase, it sends the receipt to the server, server then sends the receipt to apple's server to verify it. It's a POST request, the url is:
+When client finishes a purchase, we will get a transactionId, we should save it first.
+
+Then, we send the transactionId along with the receipt to our server, the server then sends the receipt to apple's server to verify it. It's a POST request, the url is:
 
 * sandbox: https://sandbox.itunes.apple.com/verifyReceipt 
 * product: https://buy.itunes.apple.com/verifyReceipt
@@ -76,5 +85,5 @@ A sample response:
   }
 }
 ```
-Once the transaction is verified, insert a record into the transaction table.
+If the transactionId is in the response, then it's a valid transaction, we then insert a record into the transaction table.
 

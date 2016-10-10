@@ -19,14 +19,13 @@ id | product_id | title | description | coins | enabled | time_created | time_up
 
 After register all the iap product in itunesconnect, insert the corresponding record into this table, when the client enters the purchase page, it will fetch all the enabled product in this table and then display them to the user.
 
-
 ## Handle transaction
 
 We also need a table to store all the transactions
 ```
 id | transaction_id | product_id | user_id | time_created | time_updated
 ```
-* transaction_id: the transaction id, we can get it from the iap receipt
+* transaction_id: the transaction id, we can get it when a purchase finishes
 * product_id: which product
 * user_id: who bought the product
 
@@ -85,7 +84,7 @@ A sample response:
   }
 }
 ```
-If the transactionId is in the response, then it's a valid transaction, we then insert a record into the transaction table, and tell client it's okay, then, client can clear the saved transaction id.
+From the response, we can verify the transaction, if it's valid, insert a record into the transaction table, and tell client it's okay, then, client can clear the saved transaction id.
 
-If there's something wrong with the server. The client should provide a retry mechanism to verify the saved transaction.
+If there's something wrong with the server. The client should provide a retry mechanism to verify the saved transaction. 
 
